@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Financiera</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      width: 360px;
+      text-align: center;
+      opacity: 0;
+      transform: scale(0.8);
+      animation: fadeZoomIn 1s ease-out forwards;
+    }
+
+    @keyframes fadeZoomIn {
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+      text-align: center;
+      transition: transform 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #007bff;
+      transform: scale(1.02);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      transform: scale(1.03);
+    }
+
+    .resultado {
+      margin-top: 15px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    .resultado.mostrar {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .logo {
+      text-align: center;
+      margin: 20px;
+      animation: fadeIn 1.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="logo">
+    <img src="Co-sena.logo.jpg" alt="Logo" width="150">
+  </div>
+
+  <div class="container">
+    <h2>Calculadora de Préstamos</h2>
+    <input type="text" id="monto" placeholder="Monto del préstamo" oninput="formatearNumero(this)">
+    <input type="number" id="interes" placeholder="Interés mensual (%)">
+    <input type="number" id="plazo" placeholder="Plazo en meses">
+    <button onclick="calcular()">Calcular cuota</button>
+    <div class="resultado" id="resultado"></div>
+  </div>
+
+  <script>
+    function formatearNumero(input) {
+      let valor = input.value.replace(/\D/g, ""); 
+      if (valor) {
+        input.value = new Intl.NumberFormat("es-CO").format(valor);
+      } else {
+        input.value = "";
+      }
+    }
+
+    function calcular() {
+      let monto = document.getElementById("monto").value.replace(/\./g, "").replace(/,/g, "");
+      let interes = document.getElementById("interes").value;
+      let plazo = document.getElementById("plazo").value;
+
+      monto = parseFloat(monto);
+      interes = parseFloat(interes) / 100;
+      plazo = parseInt(plazo);
+
+      const resultadoDiv = document.getElementById("resultado");
+      resultadoDiv.classList.remove("mostrar"); // Reinicia animación
+
+      if (isNaN(monto) || isNaN(interes) || isNaN(plazo)) {
+        resultadoDiv.innerText = "Por favor, complete todos los campos.";
+        resultadoDiv.classList.add("mostrar");
+        return;
+      }
+
+      let cuota = (monto * interes) / (1 - Math.pow(1 + interes, -plazo));
+      let totalPagar = cuota * plazo;
+      let intereses = totalPagar - monto;
+
+      resultadoDiv.innerHTML = `
+        Valor Cuota: $ ${new Intl.NumberFormat("es-CO").format(cuota.toFixed(0))}<br>
+        Total a pagar: $ ${new Intl.NumberFormat("es-CO").format(totalPagar.toFixed(0))}<br>
+        Intereses a pagar: $ ${new Intl.NumberFormat("es-CO").format(intereses.toFixed(0))}
+      `;
+      setTimeout(() => {
+        resultadoDiv.classList.add("mostrar");
+      }, 100); // pequeño delay para que la clase se aplique correctamente
+    }
+  </script>
+</body>
+</html>
